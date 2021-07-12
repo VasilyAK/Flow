@@ -1,6 +1,7 @@
 ﻿using Flow.Contracts;
 using Flow.Contracts.Enums;
 using Flow.Exceptions;
+using Flow.Extensions;
 using Flow.GraphMaps;
 using Flow.GraphNodes;
 using FlowTests.Fakes;
@@ -23,11 +24,11 @@ namespace FlowTests.GraphMaps
             var flowMap = new FlowMap<FakeFlowContext>();
 
             // Act
-            flowMap.AddRoot(FakeNodeIndex.Index1.ToString());
+            flowMap.AddRoot(FakeNodeIndex.Index1);
 
             // Assert
             flowMap.IsValid.Should().BeTrue();
-            flowMap.GetRoot().Index.Should().Be(FakeNodeIndex.Index1.ToString());
+            flowMap.GetRoot().Index.Should().Be(FakeNodeIndex.Index1.FullName());
         }
 
         [Fact]
@@ -38,7 +39,7 @@ namespace FlowTests.GraphMaps
             var flowMap = new FlowMap<FakeFlowContext>();
 
             // Act
-            flowMap.AddRoot(FakeNodeIndex.Index1.ToString(), flowRootNodeAction);
+            flowMap.AddRoot(FakeNodeIndex.Index1, flowRootNodeAction);
 
             // Assert
             flowMap.IsValid.Should().BeTrue();
@@ -53,7 +54,7 @@ namespace FlowTests.GraphMaps
             var flowMap = new FlowMap<FakeFlowContext>();
 
             // Act
-            flowMap.AddRoot(FakeNodeIndex.Index1.ToString(), flowRootNodeAction);
+            flowMap.AddRoot(FakeNodeIndex.Index1, flowRootNodeAction);
 
             // Assert
             flowMap.IsValid.Should().BeTrue();
@@ -174,12 +175,12 @@ namespace FlowTests.GraphMaps
         public void GetNode_ShouldReturnFlowNode()
         {
             // Arrange
-            var rootFlowNode = new FlowNode<FakeFlowContext>(FakeNodeIndex.Index1.ToString(), null, FlowNodeType.Root);
+            var rootFlowNode = new FlowNode<FakeFlowContext>(FakeNodeIndex.Index1.FullName(), null, FlowNodeType.Root);
             var flowMap = new FlowMap<FakeFlowContext>();
             flowMap.AddNode(rootFlowNode);
 
             // Act
-            var result = flowMap.GetNode(FakeNodeIndex.Index1.ToString());
+            var result = flowMap.GetNode(FakeNodeIndex.Index1);
 
             // Assert
             result.Should().Be(rootFlowNode);
@@ -189,16 +190,16 @@ namespace FlowTests.GraphMaps
         public void GetNode_ShouldThrow_IfFlowNodeNotExists()
         {
             // Arrange
-            var rootFlowNode = new FlowNode<FakeFlowContext>(FakeNodeIndex.Index1.ToString(), null, FlowNodeType.Root);
+            var rootFlowNode = new FlowNode<FakeFlowContext>(FakeNodeIndex.Index1.FullName(), null, FlowNodeType.Root);
             var flowMap = new FlowMap<FakeFlowContext>();
             flowMap.AddNode(rootFlowNode);
 
             // Act
-            Action act = () => flowMap.GetNode(FakeNodeIndex.Index2.ToString());
+            Action act = () => flowMap.GetNode(FakeNodeIndex.Index2);
 
             // Assert
             var error = act.Should().Throw<CreatingFlowMapException>();
-            error.WithMessage("Error creating flow map. Flow does not contain flow node.\r\n    - FlowNodeIndex: Index2.");
+            error.WithMessage("Error creating flow map. Flow does not contain flow node.\r\n    - FlowNodeIndex: FlowTests.Fakes.FakeNodeIndex.Index2.");
         }
         #endregion
 

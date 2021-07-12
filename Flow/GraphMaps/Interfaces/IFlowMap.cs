@@ -4,7 +4,6 @@ using System.Threading.Tasks;
 
 namespace Flow.Interfaces
 {
-    //ToDo добавть тесты на интерфейсы с TIndex
     public interface IFlowMap<TFlowContext> where TFlowContext : IFlowContext
     {
         bool IsValid { get; }
