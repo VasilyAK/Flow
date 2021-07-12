@@ -1,5 +1,6 @@
 ﻿using Flow;
 using Flow.Exceptions;
+using Flow.Extensions;
 using Flow.GraphNodes;
 using FlowTests.Fakes;
 using FluentAssertions;
@@ -29,14 +30,14 @@ namespace FlowTests
         {
             // Arrange
             var context = new FakeFlowContext();
-            Func<string, IReadOnlyFlowNode> eventHandler = (string flowNodeIndex) => new FlowNode<FlowContext>(FakeNodeIndex.Index2.ToString());
+            Func<string, IReadOnlyFlowNode> eventHandler = (string flowNodeIndex) => new FlowNode<FlowContext>(FakeNodeIndex.Index2.FullName());
             context.SubscribeSetNextEvent(eventHandler);
 
             // Act
-            context.SetNext(FakeNodeIndex.Index2.ToString());
+            context.SetNext(FakeNodeIndex.Index2);
 
             // Assert
-            context.NextFlowNode.Index.Should().Be(FakeNodeIndex.Index2.ToString());
+            context.NextFlowNode.Index.Should().Be(FakeNodeIndex.Index2.FullName());
         }
 
         [Fact]

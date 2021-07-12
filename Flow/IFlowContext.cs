@@ -1,6 +1,5 @@
 ﻿namespace Flow
 {
-    //ToDo добавть тесты на интерфейсы с TIndex
     public interface IFlowContext
     {
         IReadOnlyFlowNode[] CompletedNodes { get ; }
