@@ -10,6 +10,7 @@ using System.Threading.Tasks;
 using Xunit;
 using Flow.GraphMaps;
 using System.Collections.Generic;
+using Flow.Extensions;
 
 namespace FlowTests.GraphNodes
 {
@@ -112,23 +113,23 @@ namespace FlowTests.GraphNodes
         public void AddNext_ShouldReturnFlowNodeWithSameIndex()
         {
             // Arrange
-            var flowNode = new FlowNode<FakeFlowContext>(FakeNodeIndex.Index1.ToString());
+            var flowNode = new FlowNode<FakeFlowContext>(FakeNodeIndex.Index1.FullName());
 
             // Act
-            var result = flowNode.AddNext(FakeNodeIndex.Index2.ToString());
+            var result = flowNode.AddNext(FakeNodeIndex.Index2);
 
             // Assert
-            result.Index.Should().Be(FakeNodeIndex.Index2.ToString());
+            result.Index.Should().Be(FakeNodeIndex.Index2.FullName());
         }
 
         [Fact]
         public void AddNext_ShouldAddExistedFlowNode()
         {
             // Arrange
-            var existedFlowNode = new FlowNode<FakeFlowContext>(FakeNodeIndex.Index1.ToString());
+            var existedFlowNode = new FlowNode<FakeFlowContext>(FakeNodeIndex.Index1.FullName());
 
             // Act
-            var result = existedFlowNode.AddNext(FakeNodeIndex.Index1.ToString());
+            var result = existedFlowNode.AddNext(FakeNodeIndex.Index1);
 
             // Assert
             result.Equals(existedFlowNode).Should().BeTrue();
@@ -140,14 +141,14 @@ namespace FlowTests.GraphNodes
         public void AddNext_ShouldAddExistedFlowNodeWithNewAction(bool isAsyncAction)
         {
             // Arrange
-            var existedFlowNode = new FlowNode<FakeFlowContext>(FakeNodeIndex.Index1.ToString());
+            var existedFlowNode = new FlowNode<FakeFlowContext>(FakeNodeIndex.Index1.FullName());
             Action<FakeFlowContext> flowNodeAction = ctx => { };
             Func<FakeFlowContext, Task> flowNodeActionAsync = async ctx => { await Task.CompletedTask; };
 
             // Act
             var result = isAsyncAction
-                ? existedFlowNode.AddNext(FakeNodeIndex.Index1.ToString(), flowNodeActionAsync)
-                : existedFlowNode.AddNext(FakeNodeIndex.Index1.ToString(), flowNodeAction);
+                ? existedFlowNode.AddNext(FakeNodeIndex.Index1, flowNodeActionAsync)
+                : existedFlowNode.AddNext(FakeNodeIndex.Index1, flowNodeAction);
 
             // Assert
             result.Equals(existedFlowNode).Should().BeTrue();
@@ -159,17 +160,17 @@ namespace FlowTests.GraphNodes
         public void AddNext_ShouldReturnFlowNodeWithSameIndexAndAction(bool isAsyncAction)
         {
             // Arrange
-            var flowNode = new FlowNode<FakeFlowContext>(FakeNodeIndex.Index1.ToString());
+            var flowNode = new FlowNode<FakeFlowContext>(FakeNodeIndex.Index1.FullName());
             Action<FakeFlowContext> flowNodeAction = ctx => { };
             Func<FakeFlowContext, Task> flowNodeActionAsync = async ctx => { await Task.CompletedTask; };
 
             // Act
             var result = isAsyncAction
-                ? flowNode.AddNext(FakeNodeIndex.Index2.ToString(), flowNodeActionAsync)
-                : flowNode.AddNext(FakeNodeIndex.Index2.ToString(), flowNodeAction);
+                ? flowNode.AddNext(FakeNodeIndex.Index2, flowNodeActionAsync)
+                : flowNode.AddNext(FakeNodeIndex.Index2, flowNodeAction);
 
             // Assert
-            result.Index.Should().Be(FakeNodeIndex.Index2.ToString());
+            result.Index.Should().Be(FakeNodeIndex.Index2.FullName());
             result.HasAction.Should().BeTrue();
         }
 
@@ -191,18 +192,18 @@ namespace FlowTests.GraphNodes
         public void AddNext_ShouldDetectedReAddingFlowNodes()
         {
             // Arrange
-            var flowNode = new FlowNode<FakeFlowContext>(FakeNodeIndex.Index1.ToString());
+            var flowNode = new FlowNode<FakeFlowContext>(FakeNodeIndex.Index1.FullName());
 
             // Act
-            flowNode.AddNext(FakeNodeIndex.Index2.ToString());
-            flowNode.AddNext(FakeNodeIndex.Index2.ToString());
+            flowNode.AddNext(FakeNodeIndex.Index2);
+            flowNode.AddNext(FakeNodeIndex.Index2);
 
             // Assert
             flowNode.IsValid.Should().BeFalse();
             flowNode.ValidationErrors.Should().HaveCount(1);
             flowNode.ValidationErrors.First().Should().BeEquivalentTo(new FlowNodeValidationError
             {
-                FlowRoute = new string[] { FakeNodeIndex.Index2.ToString(), FakeNodeIndex.Index1.ToString() },
+                FlowRoute = new string[] { FakeNodeIndex.Index2.FullName(), FakeNodeIndex.Index1.FullName() },
                 Message = "Re-adding flow node detected.",
                 Type = FlowNodeErrorType.ReAddingNextFlowNode,
             });

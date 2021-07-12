@@ -4,7 +4,6 @@ using System.Threading.Tasks;
 
 namespace Flow
 {
-    //ToDo добавть тесты на интерфейсы с TIndex
     public interface IFlowNode<TFlowContext> : IReadOnlyFlowNode where TFlowContext : IFlowContext
     {
         FlowNodeValidationError[] ValidationErrors { get; }
