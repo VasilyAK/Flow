@@ -59,7 +59,6 @@ namespace FlowConsoleTests
         private static void SecondStepAction(FlowContextExample ctx)
         {
             ctx.SecondValue = 10;
-            ctx.SetNext(IndexExample.ThirdStep);
         }
 
         private static Task ThirdStepAction(FlowContextExample ctx)
@@ -71,7 +70,6 @@ namespace FlowConsoleTests
         private static Task FourthStepAction(FlowContextExample ctx)
         {
             ctx.SecondValue = 100;
-            ctx.SetNext(IndexExample.FifthStep);
             return Task.CompletedTask;
         }
 

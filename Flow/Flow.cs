@@ -9,7 +9,6 @@ using System.Threading.Tasks;
 
 namespace Flow
 {
-    //ToDo добавть тесты на интерфейсы с TIndex
     public abstract class Flow<TFlowContext> where TFlowContext : IFlowContext, new()
     {
         private readonly TFlowContext flowContext;
@@ -76,6 +75,10 @@ namespace Flow
                     flowContext.PreviousFlowNode.Index,
                     routesFlowNodeIndexSequence);
             }
+
+            if (flowContext.NextFlowNode == null)
+                SetNextAuto(flowNode);
+
             (flowContext as FlowContext).RefreshFlowNodesExecutionSequence();
         }
 
@@ -118,6 +121,14 @@ namespace Flow
             if (nextFlowNode == null)
                 throw FlowExceptionsHelper.FlowNodeNotExistExecutionException(flowNodeIndex);
             return nextFlowNode;
+        }
+
+        private void SetNextAuto(FlowNode<TFlowContext> currentNode)
+        {
+            if (currentNode.NextNodes.Keys.Count > 1)
+                throw FlowExceptionsHelper.NextStepUndefinedException(currentNode.Index, currentNode.NextNodes.Select(x => x.Value.Index).ToArray());
+            else if (currentNode.NextNodes.Keys.Count == 1)
+                (flowContext as FlowContext).SetNext(currentNode.NextNodes.Values.First().Index);
         }
 
         private void ValidateFlowMap()

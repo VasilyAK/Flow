@@ -38,7 +38,7 @@ namespace FlowTests
         [Theory]
         [InlineData(true)]
         [InlineData(false)]
-        public async Task RunFlow_ShoulExecuteAllAction(bool isAsync)
+        public async Task RunFlow_ShouldExecuteAllAction(bool isAsync)
         {
             // Arrange
             var flow = new FakeFlow1();
@@ -57,7 +57,7 @@ namespace FlowTests
         }
 
         [Fact]
-        public void RunFlow_ShoulExecuteAllActionInSameThred()
+        public void RunFlow_ShouldExecuteAllActionInSameThred()
         {
             // Arrange
             var flow = new FakeFlow2();
@@ -117,6 +117,56 @@ namespace FlowTests
             result.CurrentFlowNode.Should().BeNull();
             result.NextFlowNode.Should().BeNull();
             result.PreviousFlowNode.Index.Should().Be(FakeNodeIndex.Index2.ToString());
+        }
+
+        [Theory]
+        [InlineData(true)]
+        [InlineData(false)]
+        public async Task RunFlow_ShouldAutoSetNextStep(bool isAsync)
+        {
+            // Arrange
+            var flow = new FakeFlow8();
+
+            // Act
+            var result = isAsync ? await flow.RunFlowAsync() : flow.RunFlow();
+
+            // Assert
+            result.CompletedNodes
+                .Select(fn => fn.Index)
+                .Should().BeEquivalentTo(new string[]
+                {
+                    FakeNodeIndex.Index1.ToString(),
+                    FakeNodeIndex.Index2.ToString()
+                });
+        }
+
+        [Theory]
+        [InlineData(true)]
+        [InlineData(false)]
+        public void RunFlow_ShouldThrowIfSomePossibleStepsAndUseAutoNextStep(bool isAsync)
+        {
+            // Arrange
+            var flow = new FakeFlow9();
+
+            // Act
+            Func<Task> act;
+            if (isAsync)
+                act = async () => await flow.RunFlowAsync();
+            else
+                act = () =>
+                {
+                    flow.RunFlow();
+                    return Task.CompletedTask;
+                };
+
+            // Assert
+            var expected = "Flow execution error. Flow has detected possible next steps, but none of them is selected."
+                + "\r\n    - Possible steps:"
+                + "\r\n        Index2"
+                + "\r\n        Index3"
+                + "\r\n    - FlowNodeIndex: Index1.";
+            var error = act.Should().Throw<FlowExecutionException>();
+            error.WithMessage(expected);
         }
         #endregion
     }

@@ -22,6 +22,9 @@ namespace Flow.Exceptions
         public static FlowExecutionException FlowNodeNotExistExecutionException(string flowNodeIndex)
             => new FlowExecutionException(flowNodeIndex, "Flow does not contain flow node.");
 
+        public static FlowExecutionException NextStepUndefinedException(string flowNodeIndex, string[] possibleSteps)
+            => new FlowExecutionException(flowNodeIndex, $"Flow has detected possible next steps, but none of them is selected.\r\n    - Possible steps:\r\n        {string.Join("\r\n        ", possibleSteps)}");
+
         public static FlowExecutionException NoFlowRouteToExecuteException(string flowNodeIndex, string previousFlowNodeIndex, string[][] flowtraces)
             => new FlowExecutionException(flowNodeIndex, $"No flow route found to execute the flow action after \"{previousFlowNodeIndex}\".", flowtraces);
 

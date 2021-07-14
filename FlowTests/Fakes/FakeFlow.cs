@@ -111,4 +111,32 @@ namespace FlowTests.Fakes
 
         private void FlowNodeAction1(FakeFlowContext ctx) => ctx.SetNext(FakeNodeIndex.Index2.ToString());
     }
+
+    public class FakeFlow8 : Flow<FakeFlowContext>
+    {
+        protected override void BuildFlowMap()
+        {
+            flowMap.AddRoot(FakeNodeIndex.Index1, FlowNodeAction1)
+                .AddNext(FakeNodeIndex.Index2, FlowNodeAction2);
+        }
+
+        private void FlowNodeAction1(FakeFlowContext ctx) { }
+        private void FlowNodeAction2(FakeFlowContext ctx) { }
+    }
+
+    public class FakeFlow9 : Flow<FakeFlowContext>
+    {
+        protected override void BuildFlowMap()
+        {
+            flowMap.AddRoot(FakeNodeIndex.Index1.ToString(), FlowNodeAction1)
+                .AddNext(FakeNodeIndex.Index2.ToString(), FlowNodeAction2);
+
+            flowMap.GetNode(FakeNodeIndex.Index1.ToString())
+                .AddNext(FakeNodeIndex.Index3.ToString(), FlowNodeAction3);
+        }
+
+        private void FlowNodeAction1(FakeFlowContext ctx) { }
+        private void FlowNodeAction2(FakeFlowContext ctx) { }
+        private void FlowNodeAction3(FakeFlowContext ctx) { }
+    }
 }
