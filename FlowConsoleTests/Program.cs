@@ -6,8 +6,11 @@ namespace FlowConsoleTests
     {
         static void Main()
         {
-            (var branch, var summ) = new FlowExample().GetResult();
-            Console.WriteLine("{0} selected with result {1}.", branch, summ);
+            using (var flow = new FlowExample())
+            {
+                (var branch, var summ) = flow.GetResult();
+                Console.WriteLine("{0} selected with result {1}.", branch, summ);
+            }
         }
     }
 }

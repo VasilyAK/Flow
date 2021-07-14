@@ -2,6 +2,7 @@
 using Flow.Extensions;
 using FlowTests.Fakes;
 using FluentAssertions;
+using Moq;
 using System;
 using System.Linq;
 using System.Threading;
@@ -42,13 +43,29 @@ namespace FlowTests
         {
             // Arrange
             var flowContext = new FakeFlowContext2();
-            var flow = new FakeFlow10();
+            var flow = new FakeFlow10(flowContext);
 
             // Act
             var result = isAsync ? await flow.RunFlowAsync() : flow.RunFlow();
 
             result.TestData.Should().Be(flowContext.TestData);
         }
+
+        #region Dispose
+        [Fact]
+        public void Dispose_ShouldDisposeContext()
+        {
+            // Arrange
+            var context = new Mock<FakeFlowContext>();
+            var flow = new FakeFlow(context.Object);
+
+            // Act
+            flow.Dispose();
+
+            // Assert
+            context.Verify(x => x.Dispose(), Times.Once);
+        }
+        #endregion
 
         #region RunFlow
         [Theory]

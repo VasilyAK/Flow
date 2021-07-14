@@ -1,6 +1,8 @@
-﻿namespace Flow
+﻿using System;
+
+namespace Flow
 {
-    public interface IFlowContext
+    public interface IFlowContext : IDisposable
     {
         IReadOnlyFlowNode[] CompletedNodes { get ; }
         IReadOnlyFlowNode CurrentFlowNode { get ; }

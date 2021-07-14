@@ -8,6 +8,8 @@ namespace FlowTests.Fakes
 {
     public class FakeFlow : Flow<FakeFlowContext>
     {
+        public FakeFlow(FakeFlowContext context) : base(context) { }
+
         protected override void BuildFlowMap()
         {
             flowMap.AddRoot(FakeNodeIndex.Index1.ToString(), FlowNodeAction1);
@@ -142,6 +144,8 @@ namespace FlowTests.Fakes
 
     public class FakeFlow10 : Flow<FakeFlowContext2>
     {
+        public FakeFlow10(FakeFlowContext2 context2) : base(context2) { }
+ 
         protected override void BuildFlowMap()
         {
             flowMap.AddRoot(FakeNodeIndex.Index1, FlowNodeAction1)

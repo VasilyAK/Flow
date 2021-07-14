@@ -4,12 +4,13 @@ using Flow.Extensions;
 using Flow.GraphMaps;
 using Flow.GraphNodes;
 using Flow.Interfaces;
+using System;
 using System.Linq;
 using System.Threading.Tasks;
 
 namespace Flow
 {
-    public abstract class Flow<TFlowContext> where TFlowContext : FlowContext, new()
+    public abstract class Flow<TFlowContext> : IDisposable where TFlowContext : FlowContext, new()
     {
         private readonly TFlowContext flowContext;
         private IFlowMap<TFlowContext> flowMapContainer { get; set; }
@@ -59,6 +60,11 @@ namespace Flow
         {
             flowMapContainer = ((FlowMap<TFlowContext>)flowMap).Clone();
             flowMap = null;
+        }
+
+        public virtual void Dispose()
+        {
+            flowContext.Dispose();
         }
 
         private void ExecuteFlowNode(FlowNode<TFlowContext> flowNode, bool isAsync)

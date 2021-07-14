@@ -20,6 +20,9 @@ namespace FlowConsoleTests
         public int FirstValue { get; set; }
         public int SecondValue { get; set; }
         public int ThirdValue { get; set; }
+        public object NonControlResource { get; set; }
+
+        public new void Dispose() => NonControlResource = null;
     }
 
     public class FlowExample : Flow<FlowContextExample>

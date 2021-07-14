@@ -24,7 +24,7 @@ namespace Flow
             flowNodesExecutionSequence = new FlowNodesExecutionSequence();
         }
 
-        public void Dispose() { }
+        public virtual void Dispose() { }
 
         public void RefreshFlowNodesExecutionSequence()
         {
