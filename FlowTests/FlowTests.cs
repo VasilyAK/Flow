@@ -1,4 +1,5 @@
 ﻿using Flow.Exceptions;
+using Flow.Extensions;
 using FlowTests.Fakes;
 using FluentAssertions;
 using System;
@@ -32,6 +33,21 @@ namespace FlowTests
 
             // Assert
             act.Should().Throw<NullReferenceException>();
+        }
+
+        [Theory]
+        [InlineData(true)]
+        [InlineData(false)]
+        public async Task CreatedFlow_ShouldUseExternalContext(bool isAsync)
+        {
+            // Arrange
+            var flowContext = new FakeFlowContext2();
+            var flow = new FakeFlow10();
+
+            // Act
+            var result = isAsync ? await flow.RunFlowAsync() : flow.RunFlow();
+
+            result.TestData.Should().Be(flowContext.TestData);
         }
 
         #region RunFlow
@@ -135,8 +151,8 @@ namespace FlowTests
                 .Select(fn => fn.Index)
                 .Should().BeEquivalentTo(new string[]
                 {
-                    FakeNodeIndex.Index1.ToString(),
-                    FakeNodeIndex.Index2.ToString()
+                    FakeNodeIndex.Index1.FullName(),
+                    FakeNodeIndex.Index2.FullName()
                 });
         }
 

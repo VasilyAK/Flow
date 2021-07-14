@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 
 namespace Flow
 {
-    public abstract class Flow<TFlowContext> where TFlowContext : IFlowContext, new()
+    public abstract class Flow<TFlowContext> where TFlowContext : FlowContext, new()
     {
         private readonly TFlowContext flowContext;
         private IFlowMap<TFlowContext> flowMapContainer { get; set; }
@@ -18,7 +18,7 @@ namespace Flow
         public Flow()
         {
             flowContext = new TFlowContext();
-            (flowContext as FlowContext).SubscribeSetNextEvent(SetNext);
+            flowContext.SubscribeSetNextEvent(SetNext);
             InitializeFlowMap();
             InitializeFlowStart();
         }
@@ -26,6 +26,7 @@ namespace Flow
         public Flow(TFlowContext flowContext)
         {
             this.flowContext = flowContext;
+            flowContext.SubscribeSetNextEvent(SetNext);
             InitializeFlowMap();
             InitializeFlowStart();
         }
@@ -79,7 +80,7 @@ namespace Flow
             if (flowContext.NextFlowNode == null)
                 SetNextAuto(flowNode);
 
-            (flowContext as FlowContext).RefreshFlowNodesExecutionSequence();
+            flowContext.RefreshFlowNodesExecutionSequence();
         }
 
         //ToDo продумать кеширование, чтобы не запускать валидацию карты при каждом создании инстанса
@@ -94,8 +95,8 @@ namespace Flow
         private void InitializeFlowStart()
         {
             var rootFlowNode = (FlowNode<TFlowContext>)flowMapContainer.GetRoot();
-            (flowContext as FlowContext).SetNext(rootFlowNode.Index);
-            (flowContext as FlowContext).RefreshFlowNodesExecutionSequence();
+            flowContext.SetNext(rootFlowNode.Index);
+            flowContext.RefreshFlowNodesExecutionSequence();
         }
 
         private void RunFlowNode(FlowNode<TFlowContext> flowNode, bool isAsync)
@@ -128,7 +129,7 @@ namespace Flow
             if (currentNode.NextNodes.Keys.Count > 1)
                 throw FlowExceptionsHelper.NextStepUndefinedException(currentNode.Index, currentNode.NextNodes.Select(x => x.Value.Index).ToArray());
             else if (currentNode.NextNodes.Keys.Count == 1)
-                (flowContext as FlowContext).SetNext(currentNode.NextNodes.Values.First().Index);
+                flowContext.SetNext(currentNode.NextNodes.Values.First().Index);
         }
 
         private void ValidateFlowMap()

@@ -10,4 +10,9 @@ namespace FlowTests.Fakes
     {
         public int ThreadIdInProcess { get; set; }
     }
+
+    public class FakeFlowContext2 : FlowContext
+    {
+        public string TestData { get; set; } = "TestData";
+    }
 }
