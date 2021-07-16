@@ -17,7 +17,7 @@ jobs:
       with:
         dotnet-version: 5.0.x
     - name: Restore dependencies
-      run: dotnet restore
+      run: dotnet restore "Flow/Flow/Flow.sln"
     - name: Build
       run: dotnet build "Flow/Flow/Flow.sln" --no-restore
     - name: Test
