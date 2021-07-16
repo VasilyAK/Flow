@@ -33,7 +33,11 @@ jobs:
     - name: Setup .NET
       uses: actions/setup-dotnet@v1
       with:
-        dotnet-version: 5.0.x
+       dotnet-version: 5.x
+    - uses: nuget/setup-nuget@v1
+      with:
+        nuget-api-key: ${{ secrets.NuGetAPIKey }}
+        nuget-version: '5.x'
     - name: Restore dependencies
       run: dotnet restore "FlowTests/FlowTests.sln"
     - name: Build
