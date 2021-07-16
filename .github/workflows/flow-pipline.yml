@@ -22,7 +22,7 @@ jobs:
     - name: Build
       run: dotnet build "Flow/Flow.sln" --no-restore
       
-  Test Flow
+  Test Flow:
     runs-on: windows-latest
     
     steps:
