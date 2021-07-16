@@ -35,8 +35,8 @@ jobs:
       with:
         dotnet-version: 5.0.x
     - name: Restore dependencies
-      run: dotnet restore "Flow/FlowTests/FlowTests.sln"
+      run: dotnet restore "FlowTests/FlowTests.sln"
     - name: Build
-      run: dotnet build "Flow/FlowTests/FlowTests.sln" --no-restore
+      run: dotnet build "FlowTests/FlowTests.sln" --no-restore
     - name: Test
-      run: dotnet test "Flow/FlowTests/**/*.dll" --no-build --verbosity normal
+      run: dotnet test "FlowTests/**/*.dll" --no-build --verbosity normal
