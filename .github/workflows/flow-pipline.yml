@@ -7,7 +7,8 @@ on:
     branches: master
 
 jobs:
-  Build Flow:
+  - job: Build_Flow
+    displayName: Build Flow project    
     runs-on: windows-latest
 
     steps:
@@ -22,7 +23,8 @@ jobs:
     - name: Build
       run: dotnet build "Flow/Flow.sln" --no-restore
       
-  Test Flow:
+  - job: Test_Flow
+    displayName: Test Flow project
     runs-on: windows-latest
     
     steps:
