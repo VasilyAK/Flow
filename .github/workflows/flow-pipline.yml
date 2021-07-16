@@ -8,22 +8,6 @@ on:
 
 jobs:
   Build_Flow:
-    name: Build Flow project    
-    runs-on: windows-latest
-
-    steps:
-    - name: Clone repo
-      uses: actions/checkout@v2
-    - name: Setup .NET
-      uses: actions/setup-dotnet@v1
-      with:
-        dotnet-version: 5.0.x
-    - name: Restore dependencies
-      run: dotnet restore "Flow/Flow.sln"
-    - name: Build
-      run: dotnet build "Flow/Flow.sln" --no-restore
-      
-  Test_Flow:
     name: Test Flow project
     runs-on: windows-latest
     
@@ -34,13 +18,18 @@ jobs:
       uses: actions/setup-dotnet@v1
       with:
        dotnet-version: 5.x
-    - uses: nuget/setup-nuget@v1
+    - name: Restore NuGet
+      uses: nuget/setup-nuget@v1
       with:
         nuget-api-key: ${{ secrets.NuGetAPIKey }}
         nuget-version: '5.x'
     - name: Restore dependencies
-      run: dotnet restore "FlowTests/FlowTests.sln"
+      run:
+        dotnet restore "Flow/Flow.sln"
+        dotnet restore "FlowTests/FlowTests.sln"
     - name: Build
-      run: dotnet build "FlowTests/FlowTests.sln" --no-restore
+      run:
+        dotnet build "Flow/Flow.sln" --no-restore
+        dotnet build "FlowTests/FlowTests.sln" --no-restore
     - name: Test
-      run: dotnet test "FlowTests/**/*.dll" --no-build --verbosity normal
+      run: dotnet test "FlowTests/**/*.dll" --verbosity normal
