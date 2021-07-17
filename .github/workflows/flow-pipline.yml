@@ -32,4 +32,4 @@ jobs:
     - name: Build FlowTests
       run: dotnet build "FlowTests/FlowTests.sln" --no-restore
     - name: Test
-      run: dotnet test "FlowTests/**/FlowTests.dll" --no-restore --verbosity normal
+      run: dotnet test /p:CollectCoverage=true /P:Include="FlowTests/**/*Tests.dll" /p:ExcludeByFile="**\bin\**\ref\**" --no-restore --verbosity normal
