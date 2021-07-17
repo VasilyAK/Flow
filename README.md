@@ -1,4 +1,4 @@
-# Библиотека Flow
+# Библиотека Flow <img src="https://github.com/VasilyAK/Flow/workflows/Flow-CI/badge.svg?branch=master"/>
 
 ## Введение
 
