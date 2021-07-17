@@ -23,13 +23,13 @@ jobs:
       with:
         nuget-api-key: ${{ secrets.NuGetAPIKey }}
         nuget-version: '5.x'
-    - name: Restore Flow dependencies
-      run: dotnet restore "Flow/Flow.sln"
-    - name: Restore FlowTests dependencies
-      run: dotnet restore "FlowTests/FlowTests.sln"
-    - name: Build Flow
-      run: dotnet build "Flow/Flow.sln" --no-restore
-    - name: Build FlowTests
-      run: dotnet build "FlowTests/FlowTests.sln" --no-restore
+    - name: Restore dependencies
+      run: |
+        dotnet restore "Flow/Flow.sln"
+        dotnet restore "FlowTests/FlowTests.sln"
+    - name: Build
+      run: |
+        dotnet build "Flow/Flow.sln" --no-restore
+        dotnet build "FlowTests/FlowTests.sln" --no-restore
     - name: Test
       run: dotnet test "FlowTests/FlowTests.sln" --no-build --verbosity normal
