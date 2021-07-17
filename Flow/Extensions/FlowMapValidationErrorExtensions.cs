@@ -14,8 +14,8 @@ namespace Flow.Extensions
             var flowNodeValidateError = flowMapValidationError.FlowNodeErrors.FirstOrDefault();
             if (flowNodeValidateError != null)
             {
-                flowErrorContext.FlowRoutes = new string[][] { flowNodeValidateError.FlowRoute };
-                flowErrorContext.Message = $"{flowMapValidationError.Message} {flowNodeValidateError.Message}";
+                flowErrorContext.FlowRoutes = flowMapValidationError.FlowNodeErrors.Select(x => x.FlowRoute).ToArray();
+                flowErrorContext.Message = $"{flowMapValidationError.Message}. {flowNodeValidateError.Message}.";
             }
             else
                 flowErrorContext.Message = flowMapValidationError.Message;

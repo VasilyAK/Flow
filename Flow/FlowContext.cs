@@ -5,7 +5,6 @@ using System.Collections.Generic;
 
 namespace Flow
 {
-    //ToDo проверить работоспособность примеров в документации
     public abstract class FlowContext : IFlowContext
     {
         private delegate IReadOnlyFlowNode SetNextFlowNode(string flowNodeIndex);
