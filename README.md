@@ -162,7 +162,7 @@ public interface IFlowContext
     IReadOnlyFlowNode NextFlowNode { get ; }
     IReadOnlyFlowNode PreviousFlowNode { get ; }
     
-    public virtual void Dispose();
+    void Dispose();
 
     // Назначить следующую исполняемую ноду
     void SetNext(string flowNodeIndex);
