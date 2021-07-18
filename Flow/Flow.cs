@@ -32,9 +32,8 @@ namespace Flow
             InitializeFlowStart();
         }
 
-        //ToDo перевести все описания на английский
         /// <summary>
-        /// Запустить поток на исполнение
+        /// Start the flow for execution
         /// </summary>
         public TFlowContext RunFlow()
         {
@@ -43,7 +42,7 @@ namespace Flow
         }
 
         /// <summary>
-        /// Запустить поток на исполнение
+        /// Start the flow for execution
         /// </summary>
         public async Task<TFlowContext> RunFlowAsync()
         {
@@ -52,7 +51,7 @@ namespace Flow
         }
 
         /// <summary>
-        /// Построить карту потока
+        /// Build a flow map
         /// </summary>
         protected virtual void BuildFlowMap() { }
 

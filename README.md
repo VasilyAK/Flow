@@ -1,48 +1,39 @@
-# Библиотека Flow <img src="https://github.com/VasilyAK/Flow/workflows/Flow-CI/badge.svg?branch=master"/>
+# Flow <img src="https://github.com/VasilyAK/Flow/workflows/Flow-CI/badge.svg?branch=master"/>
 
-## Введение
+## Introduction
 
-Одна из самых распространенных проблем в программировании - это проблема организации кода. Код должен быть написан так, чтобы его было удобно читать и вносить изменения. Однако в процессе разработки далеко не всегда есть возможность наперед предусмотреть какого рода функционал потребуется реализовать и как разместить его в уже существующем коде.
+Flow is a C # library whose internal logic is based on graph theory. The library provides a tool for programmers when it is necessary to have access to initial or intermediate results over several sequential processes.
 
-### Цели
+## Goals
 
-- Иметь возможность быстро и удобно встраивать новую логику в уже существующий код
-- Контролировать последовательность исполнения кода в удобной форме
-- Просто и лаконично писать тесты
+- Be able to quickly and conveniently embed new logic into existing code
+- Control the sequence of code execution in a convenient form
+- Writing tests simply and concisely
 
-### Соглашения о терминах
+## Terms conventions
 
-- Flow: Поток - последовательность выполняемых операций, каждая из которых идентифицируется уникальным кодом
+- Flow: sequence of operations performed, each of which is identified by a unique code.
 
-- FlowNode: Нода потока - атомарная структура потока, отвечающая за исполнение назначенной операции.
+- FlowNode:an atomic thread structure that is responsible for executing a designated operation.
 
-- FlowMap: Карта потока - набор инструкций, описывающий последовательность выполнения операций и зависимости между нодами потока.
+- FlowMap: a set of instructions describing the flow of operations and dependencies between flow nodes.
 
-- FlowContext: Контекст потока - объект для передачи команд потоку, а так же для передачи результатов выполнения операций между нодами потока.
+- FlowContext: an object for transmitting commands to a flow, as well as for transmitting the results of operations between the nodes of the flow.
 
-### Ссылки на источники
+## User documentation
 
-- [Спецификация требований программного обеспечения][ref1]
+<details>
+  <summary>Main example</summary>
 
-## Общее описание
+### Operation flow chart
 
-### Видение продукта
+          -----| FirstStep | -----
+          |                      |
+    | SecondStep |         | FourthStep |
+          |                      |
+    | ThirdStep  |         |  FifthStep |
 
-Flow - это C# библиотека. Внутренняя логика библиотеки основана на теории графов.
-
-### Функциональность продукта
-
-### Документация для пользователей
-
-#### Схема выполнения операций
-
-        -----| Index1 | -----
-        |                   |
-    | Index2 |          | Index4 |
-        |                   |
-    | Index3 |          | Index5 |
-
-#### Пример реализации
+### Implementation example
 
 ```c#
     public enum IndexExample
@@ -56,14 +47,13 @@ Flow - это C# библиотека. Внутренняя логика биб�
 
     public class FlowContextExample : FlowContext
     {
-        public bool IsFirstBranchSelected { get; set; } = false;
-        public bool IsSecondBranchSelected { get; set; } = false;
+        public string SelectedBranch { get; set; } = "No branch";
         public int FirstValue { get; set; }
         public int SecondValue { get; set; }
         public int ThirdValue { get; set; }
         public object NonControlResource { get; set; }
 
-        public new void Dispose() => NonControlResource = null;
+        public new void Dispose() => NonControlResource = null; //.Dispose()
     }
 
     public class FlowExample : Flow<FlowContextExample>
@@ -90,12 +80,12 @@ Flow - это C# библиотека. Внутренняя логика биб�
             ctx.FirstValue = new Random().Next(10);
             if (ctx.FirstValue < 5)
             {
-                ctx.IsFirstBranchSelected = true;
+                ctx.SelectedBranch = "Left branch";
                 ctx.SetNext(IndexExample.SecondStep);
             }
             else
             {
-                ctx.IsSecondBranchSelected = true;
+                ctx.SelectedBranch = "Right branch";
                 ctx.SetNext(IndexExample.FourthStep);
             }
         }
@@ -125,191 +115,107 @@ Flow - это C# библиотека. Внутренняя логика биб�
         private (string branch, int summ) ProcessContext(FlowContextExample context)
         {
             var summ = context.FirstValue + context.SecondValue + context.ThirdValue;
-            var branchSelected = context.IsFirstBranchSelected
-                ? "First branch"
-                : context.IsSecondBranchSelected ? "Second branch" : "No branch";
-            return (branchSelected, summ);
+            return (context.SelectedBranch, summ);
         }
 ```
+</details>
 
-### Допущения и зависимости
+## Programming interfaces
 
-- Удалить, если будет нечего написать
+<details>
+  <summary>Flow</summary>
 
-## Функциональность системы
+```c#
+    public abstract class Flow
+    {
+        public virtual void Dispose();
 
-### Программные интерфейсы
+        // Start the flow for execution
+        public TFlowContext RunFlow();
+        public async Task<TFlowContext> RunFlowAsync();
 
-``` c#
-public abstract class Flow
-{
-    public virtual void Dispose();
-
-    // Запустить поток на исполнение
-    public TFlowContext RunFlow();
-    public async Task<TFlowContext> RunFlowAsync();
-    
-    // Построить карту потока
-    protected virtual void BuildFlowMap() { };
-}
+        // Build a flow map
+        protected virtual void BuildFlowMap() { };
+    }
 ```
+</details>
 
-``` c#
-public interface IFlowContext
-{
-    IReadOnlyFlowNode[] CompletedNodes { get ; }
-    IReadOnlyFlowNode CurrentFlowNode { get ; }
-    IReadOnlyFlowNode NextFlowNode { get ; }
-    IReadOnlyFlowNode PreviousFlowNode { get ; }
-    
-    void Dispose();
+<details>
+  <summary>IFlowContext</summary>
 
-    // Назначить следующую исполняемую ноду
-    void SetNext(string flowNodeIndex);
-    void SetNext<TIndex>(TIndex flowNodeIndex) where TIndex : struct;
-}
+```c#
+    public interface IFlowContext
+    {
+        IReadOnlyFlowNode[] CompletedNodes { get ; }
+        IReadOnlyFlowNode CurrentFlowNode { get ; }
+        IReadOnlyFlowNode NextFlowNode { get ; }
+        IReadOnlyFlowNode PreviousFlowNode { get ; }
+        
+        void Dispose();
+
+        // Assign the next executable node
+        void SetNext(string flowNodeIndex);
+        void SetNext<TIndex>(TIndex flowNodeIndex) where TIndex : struct;
+    }
 ```
+</details>
 
-``` c#
-public interface IFlowMap<TFlowContext> where TFlowContext : IFlowContext
-{
-    bool IsValid { get; }
-    FlowMapValidationError[] ValidationErrors { get; }
+<details>
+  <summary>IFlowMap</summary>
 
-    // Добавить в карту корневую ноду
-    IFlowNode<TFlowContext> AddRoot(string flowNodeIndex);
-    IFlowNode<TFlowContext> AddRoot<TIndex>(TIndex flowNodeIndex) where TIndex : struct;
+```c#
+    public interface IFlowMap<TFlowContext> where TFlowContext : IFlowContext
+    {
+        bool IsValid { get; }
+        FlowMapValidationError[] ValidationErrors { get; }
 
-    // Добавить в карту корневую ноду
-    IFlowNode<TFlowContext> AddRoot(string flowNodeIndex, Action<TFlowContext> flowNodeAction);
-    IFlowNode<TFlowContext> AddRoot<TIndex>(TIndex flowNodeIndex, Action<TFlowContext> flowNodeAction) where TIndex : struct;
+        // Add a root node to the map
+        IFlowNode<TFlowContext> AddRoot(string flowNodeIndex);
+        IFlowNode<TFlowContext> AddRoot<TIndex>(TIndex flowNodeIndex) where TIndex : struct;
+        IFlowNode<TFlowContext> AddRoot(string flowNodeIndex, Action<TFlowContext> flowNodeAction);
+        IFlowNode<TFlowContext> AddRoot<TIndex>(TIndex flowNodeIndex, Action<TFlowContext> flowNodeAction) where TIndex : struct;
+        IFlowNode<TFlowContext> AddRoot(string flowNodeIndex, Func<TFlowContext, Task> flowNodeAction);
+        IFlowNode<TFlowContext> AddRoot<TIndex>(TIndex flowNodeIndex, Func<TFlowContext, Task> flowNodeAction) where TIndex : struct;
 
-    // Добавить в карту корневую ноду
-    IFlowNode<TFlowContext> AddRoot(string flowNodeIndex, Func<TFlowContext, Task> flowNodeAction);
-    IFlowNode<TFlowContext> AddRoot<TIndex>(TIndex flowNodeIndex, Func<TFlowContext, Task> flowNodeAction) where TIndex : struct;
+        // Get a node by its index
+        IFlowNode<TFlowContext> GetNode(string flowNodeIndex);
+        IFlowNode<TFlowContext> GetNode<TIndex>(TIndex flowNodeIndex) where TIndex : struct;
 
-    // Получить ноду по ее ключу
-    IFlowNode<TFlowContext> GetNode(string flowNodeIndex);
-    IFlowNode<TFlowContext> GetNode<TIndex>(TIndex flowNodeIndex) where TIndex : struct;
+        // Get root node
+        IFlowNode<TFlowContext> GetRoot();
+    }
+```
+</details>
 
-    // Получить корневую ноду
-    IFlowNode<TFlowContext> GetRoot();
-}
+<details>
+  <summary>FlowNode</summary>
+
+```c#
+    public interface IReadOnlyFlowNode
+    {
+        string Index { get; }
+        bool HasAction { get; }
+        bool IsValid { get; }
+        FlowNodeType Type { get; }
+    }
 ```
 
 ```c#
-public interface IReadOnlyFlowNode
-{
-    string Index { get; }
-    bool HasAction { get; }
-    bool IsValid { get; }
-    FlowNodeType Type { get; }
-}
+    public interface IFlowNode<TFlowContext> : IReadOnlyFlowNode where TFlowContext : IFlowContext
+    {
+        FlowNodeValidationError[] ValidationErrors { get; }
+
+        // Assign an executable action to the node
+        IFlowNode<TFlowContext> AddAction(Action<TFlowContext> flowNodeAction);
+        IFlowNode<TFlowContext> AddAction(Func<TFlowContext, Task> flowNodeAction);
+
+        // Add a link to the next executable node
+        IFlowNode<TFlowContext> AddNext(string flowNodeIndex);
+        IFlowNode<TFlowContext> AddNext<TIndex>(TIndex flowNodeIndex) where TIndex : struct;
+        IFlowNode<TFlowContext> AddNext(string flowNodeIndex, Action<TFlowContext> flowNodeAction);
+        IFlowNode<TFlowContext> AddNext<TIndex>(TIndex flowNodeIndex, Action<TFlowContext> flowNodeAction) where TIndex : struct;
+        IFlowNode<TFlowContext> AddNext(string flowNodeIndex, Func<TFlowContext, Task> flowNodeAction);
+        IFlowNode<TFlowContext> AddNext<TIndex>(TIndex flowNodeIndex, Func<TFlowContext, Task> flowNodeAction) where TIndex : struct;
+    }
 ```
-
-```c#
-public interface IFlowNode<TFlowContext> : IReadOnlyFlowNode where TFlowContext : IFlowContext
-{
-    FlowNodeValidationError[] ValidationErrors { get; }
-
-    // Назначить ноде исполняемое действие
-    IFlowNode<TFlowContext> AddAction(Action<TFlowContext> flowNodeAction);
-
-    // Назначить ноде исполняемое действие
-    IFlowNode<TFlowContext> AddAction(Func<TFlowContext, Task> flowNodeAction);
-
-    // Добавить ссылку на следующую исполняемую ноду
-    IFlowNode<TFlowContext> AddNext(string flowNodeIndex);
-    IFlowNode<TFlowContext> AddNext<TIndex>(TIndex flowNodeIndex) where TIndex : struct;
-
-    // Добавить ссылку на следующую исполняемую ноду
-    IFlowNode<TFlowContext> AddNext(string flowNodeIndex, Action<TFlowContext> flowNodeAction);
-    IFlowNode<TFlowContext> AddNext<TIndex>(TIndex flowNodeIndex, Action<TFlowContext> flowNodeAction) where TIndex : struct;
-
-    // Добавить ссылку на следующую исполняемую ноду
-    IFlowNode<TFlowContext> AddNext(string flowNodeIndex, Func<TFlowContext, Task> flowNodeAction);
-    IFlowNode<TFlowContext> AddNext<TIndex>(TIndex flowNodeIndex, Func<TFlowContext, Task> flowNodeAction) where TIndex : struct;
-}
-```
-
-## Нефункциональные требования
-
-### Требования к производительности
-
-- Приложить результаты тестов на производительность
-
-### Требования к качеству программного обеспечения
-
-- FlowNode
-
-  - При запуске на исполнение
-
-    1. Нода должна содержать инструкцию на исполнение, иначе - ошибка.
-    2. Нода должна поддерживать возможность исполнения синхронной и асинхронной операции.
-
-  - При инициализации
-
-    1. Корневая нода не должна иметь родительских нод, иначе - нода не валидна.
-    2. Нода не должна иметь двух дочерних нод с одинаковыми ключами, иначе - нода не валидна.
-    3. Нода не должна иметь циклических ссылок на саму себя (быть родителем n-го порядка для самой.себя), иначе - нода не валидна
-    4. Связи между каждыми двумя нодами должны быть одинарными
-    5. Нода должна идентифицироваться уникальным строковым ключом
-    6. Нода должна содержать отчет о всех ошибках, полученных при инициализации
-    7. Сравнение эквивалентности должно быть реализовано через ReferenceEquals
-
-- FlowMap
-
-  - При запуске на исполнение
-
-    1. Карта потока используется только для описания связей между нодами потока и не используется в момент запуска потока на исполнение.
-    2. Не должно быть возможности изменять карту потока вне конструктора контекста потока.
-
-  - При инициализации
-
-    1. Карта потока должна содержать единственную корневую ноду.
-    2. Все ноды карты потока должны быть валидными.
-    3. Карта потока должна предоставлять доступ к любой ноде потока.
-    4. Карта потока должна содержать отчет о всех ошибках, полученных при инициализации
-    5. Сравнение эквивалентности должно быть реализовано через ReferenceEquals
-
-- FlowContext
-
-  - При запуске на исполнение
-
-    1. Контекст должен предоставить возможность задавать порядок выполнения операций.
-    2. Контекст должен предоставлять информацию о процессе исполнения
-        - Предыдущая нода
-        - Текущая нода
-        - Следующая нода
-        - Завершенные ноды
-    3. Во время асинхронного выполнения ноды, контекст должен быть заблокирован для других потоков, за исключением дочерних.
-    4. Контекст должен реализовывать интерфейс System.IDisposable
-
-  - При инициализации
-
-    1. Карта потока должна быть валидной, иначе - ошибка.
-    2. По умолчанию на исполнение назначается корневая нода
-    
-- Flow
-
-  - При запуске на исполнение
-
-    1. Поток должен предоставлять возможность задавать порядок выполнения операций.
-    2. Поток должен предоставлять возможность назначить действие на ноду
-    3. Поток должен предоставлять возможность запускать поток на исполнение.
-
-  - При инициализации
-
-    1. Карта потока должна быть валидной, иначе - ошибка.
-    2. По умолчанию на исполнение назначается корневая нода.
-    3. Поток должен реализовывать интерфейс System.IDisposable.
-
-## Прочее
-
-### Приложение А: Глоссарий
-
-### Приложение Б: Модели процессов и предметной области и другие диаграммы
-
-### Приложение В: Список ключевых задач
-
-[ref1]: https://ru.wikipedia.org/wiki/%D0%A1%D0%BF%D0%B5%D1%86%D0%B8%D1%84%D0%B8%D0%BA%D0%B0%D1%86%D0%B8%D1%8F_%D1%82%D1%80%D0%B5%D0%B1%D0%BE%D0%B2%D0%B0%D0%BD%D0%B8%D0%B9_%D0%BF%D1%80%D0%BE%D0%B3%D1%80%D0%B0%D0%BC%D0%BC%D0%BD%D0%BE%D0%B3%D0%BE_%D0%BE%D0%B1%D0%B5%D1%81%D0%BF%D0%B5%D1%87%D0%B5%D0%BD%D0%B8%D1%8F
+</details>

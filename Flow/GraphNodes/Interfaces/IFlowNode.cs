@@ -9,27 +9,36 @@ namespace Flow
         FlowNodeValidationError[] ValidationErrors { get; }
 
         /// <summary>
-        /// Назначить ноде исполняемое действие
+        /// Assign an executable action to the node
         /// </summary>
         IFlowNode<TFlowContext> AddAction(Action<TFlowContext> flowNodeAction);
         /// <summary>
-        /// Назначить ноде исполняемое действие
+        /// Assign an executable action to the node
         /// </summary>
         IFlowNode<TFlowContext> AddAction(Func<TFlowContext, Task> flowNodeAction);
         /// <summary>
-        /// Добавить ссылку на следующую исполняемую ноду
+        /// Add a link to the next executable node
         /// </summary>
         IFlowNode<TFlowContext> AddNext(string flowNodeIndex);
+        /// <summary>
+        /// Add a link to the next executable node
+        /// </summary>
         IFlowNode<TFlowContext> AddNext<TIndex>(TIndex flowNodeIndex) where TIndex : struct;
         /// <summary>
-        /// Добавить ссылку на следующую исполняемую ноду
+        /// Add a link to the next executable node
         /// </summary>
         IFlowNode<TFlowContext> AddNext(string flowNodeIndex, Action<TFlowContext> flowNodeAction);
+        /// <summary>
+        /// Add a link to the next executable node
+        /// </summary>
         IFlowNode<TFlowContext> AddNext<TIndex>(TIndex flowNodeIndex, Action<TFlowContext> flowNodeAction) where TIndex : struct;
         /// <summary>
-        /// Добавить ссылку на следующую исполняемую ноду
+        /// Add a link to the next executable node
         /// </summary>
         IFlowNode<TFlowContext> AddNext(string flowNodeIndex, Func<TFlowContext, Task> flowNodeAction);
+        /// <summary>
+        /// Add a link to the next executable node
+        /// </summary>
         IFlowNode<TFlowContext> AddNext<TIndex>(TIndex flowNodeIndex, Func<TFlowContext, Task> flowNodeAction) where TIndex : struct;
     }
 }

@@ -15,14 +15,13 @@ namespace FlowConsoleTests
 
     public class FlowContextExample : FlowContext
     {
-        public bool IsFirstBranchSelected { get; set; } = false;
-        public bool IsSecondBranchSelected { get; set; } = false;
+        public string SelectedBranch { get; set; } = "No branch";
         public int FirstValue { get; set; }
         public int SecondValue { get; set; }
         public int ThirdValue { get; set; }
         public object NonControlResource { get; set; }
 
-        public new void Dispose() => NonControlResource = null;
+        public new void Dispose() => NonControlResource = null; //.Dispose()
     }
 
     public class FlowExample : Flow<FlowContextExample>
@@ -49,12 +48,12 @@ namespace FlowConsoleTests
             ctx.FirstValue = new Random().Next(10);
             if (ctx.FirstValue < 5)
             {
-                ctx.IsFirstBranchSelected = true;
+                ctx.SelectedBranch = "Left branch";
                 ctx.SetNext(IndexExample.SecondStep);
             }
             else
             {
-                ctx.IsSecondBranchSelected = true;
+                ctx.SelectedBranch = "Right branch";
                 ctx.SetNext(IndexExample.FourthStep);
             }
         }
@@ -84,10 +83,7 @@ namespace FlowConsoleTests
         private (string branch, int summ) ProcessContext(FlowContextExample context)
         {
             var summ = context.FirstValue + context.SecondValue + context.ThirdValue;
-            var branchSelected = context.IsFirstBranchSelected
-                ? "First branch"
-                : context.IsSecondBranchSelected ? "Second branch" : "No branch";
-            return (branchSelected, summ);
+            return (context.SelectedBranch, summ);
         }
     }
 }

@@ -10,11 +10,11 @@ namespace Flow
         IReadOnlyFlowNode PreviousFlowNode { get ; }
 
         /// <summary>
-        /// Назначить следующую исполняемую ноду
+        /// Assign the next executable node
         /// </summary>
         void SetNext(string flowNodeIndex);
         /// <summary>
-        /// Назначить следующую исполняемую ноду
+        /// Assign the next executable node
         /// </summary>
         void SetNext<TIndex>(TIndex flowNodeIndex) where TIndex : struct;
     }
