@@ -4,7 +4,6 @@ using System.Linq;
 
 namespace Flow.Extensions
 {
-    //ToDo покрыть тестами
     public static class FlowMapValidationErrorExtensions
     {
         public static FlowException ToFlowException(this FlowMapValidationError flowMapValidationError)
