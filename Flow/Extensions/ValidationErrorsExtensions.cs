@@ -5,7 +5,6 @@ using System.Linq;
 
 namespace Flow.Extensions
 {
-    //ToDo покрыть тестами
     public static class ValidationErrorsExtensions
     {
         public static void Actualize<TValidationError>(
@@ -18,11 +17,10 @@ namespace Flow.Extensions
             var existedValidationError = validationErrors.FirstOrDefault(searchRule);
             if (existedValidationError != null && onUpdate != null)
                 onUpdate(existedValidationError);
-            else if (existedValidationError == null)
+            else if (existedValidationError == null && onAdd != null)
             {
                 var validationError = new TValidationError();
-                if (onAdd != null)
-                    onAdd(validationError);
+                onAdd(validationError);
                 validationErrors.Add(validationError);
             }
         }
