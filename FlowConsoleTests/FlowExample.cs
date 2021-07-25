@@ -26,6 +26,8 @@ namespace FlowConsoleTests
 
     public class FlowExample : Flow<FlowContextExample>
     {
+        public FlowExample() : base(FlowCache<FlowExample>()) { } //micro optimization
+
         public (string branch, int summ) GetResult() => ProcessContext(RunFlow());
 
         public async Task<(string branch, int summ)> GetResultAsync() => ProcessContext(await RunFlowAsync());

@@ -12,10 +12,17 @@ namespace FlowConsoleTests
                 Console.WriteLine("{0} selected with result {1}.", branch, summ);
             }
 
-            var perfomanceTest = new FlowPerformanceTesting().DoPerfomanceTest();
-            Console.WriteLine(FlowPerformanceTesting.CreateTableHeader());
-            foreach (var test in perfomanceTest)
-                Console.WriteLine(FlowPerformanceTesting.CreateTableRow(test));
+            try
+            {
+                new FlowPerformanceTesting().DoPerfomanceTest();
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.Message + "\r\n" + ex.StackTrace);
+            }
+
+            Console.WriteLine("Press \"Esc\" to close application.");
+            while (Console.ReadKey().Key != ConsoleKey.Escape);
         }
     }
 }
