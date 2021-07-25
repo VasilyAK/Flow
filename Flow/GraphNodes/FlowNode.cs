@@ -18,12 +18,13 @@ namespace Flow.GraphNodes
         private delegate Task FlowNodeActionAsync(TFlowContext ctx);
         private FlowNodeActionAsync flowNodeActionAsync { get; set; }
 
-        private readonly List<FlowNodeValidationError> validationErrors;
+        private bool shouldSkipValidation { get; set; }
+        private List<FlowNodeValidationError> validationErrors { get; set; }
 
         #region public to interface
         public bool HasAction => flowNodeAction != null || flowNodeActionAsync != null;
         public bool IsValid => !ValidationErrors.Any();
-        public FlowNodeType Type { get; }
+        public FlowNodeType Type { get; private set; }
         public FlowNodeValidationError[] ValidationErrors
         {
             get
@@ -44,29 +45,22 @@ namespace Flow.GraphNodes
         public FlowNode(
             string flowNodeIndex,
             FlowNodeType flowNodeType = FlowNodeType.Variable,
-            bool shouldCreateMap = true)
+            bool shouldCreateMap = true,
+            bool shouldSkipValidation = false)
             : base(flowNodeIndex, false)
         {
-            Type = flowNodeType;
-            validationErrors = new List<FlowNodeValidationError>();
-
-            if (shouldCreateMap)
-                FlowMapInit();
+            FlowNodeInit(flowNodeType, shouldCreateMap, shouldSkipValidation);
         }
 
         public FlowNode(
             string flowNodeIndex,
             Action<TFlowContext> flowNodeAction,
             FlowNodeType flowNodeType = FlowNodeType.Variable,
-            bool shouldCreateMap = true)
+            bool shouldCreateMap = true,
+            bool shouldSkipValidation = false)
             : base(flowNodeIndex, false)
         {
-            Type = flowNodeType;
-            validationErrors = new List<FlowNodeValidationError>();
-
-            if (shouldCreateMap)
-                FlowMapInit();
-
+            FlowNodeInit(flowNodeType, shouldCreateMap, shouldSkipValidation);
             AddAction(flowNodeAction);
         }
 
@@ -74,15 +68,11 @@ namespace Flow.GraphNodes
             string flowNodeIndex,
             Func<TFlowContext, Task> flowNodeAction,
             FlowNodeType flowNodeType = FlowNodeType.Variable,
-            bool shouldCreateMap = true)
+            bool shouldCreateMap = true,
+            bool shouldSkipValidation = false)
             : base(flowNodeIndex, false)
         {
-            Type = flowNodeType;
-            validationErrors = new List<FlowNodeValidationError>();
-
-            if (shouldCreateMap)
-                FlowMapInit();
-
+            FlowNodeInit(flowNodeType, shouldCreateMap, shouldSkipValidation);
             AddAction(flowNodeAction);
         }
 
@@ -112,7 +102,7 @@ namespace Flow.GraphNodes
         public IFlowNode<TFlowContext> AddNext(string flowNodeIndex)
         {
             var existedFlowNode = FlowMap.FindNode(flowNodeIndex);
-            var flowNodeToAdd = existedFlowNode ?? new FlowNode<TFlowContext>(flowNodeIndex, FlowNodeType.Variable, false);
+            var flowNodeToAdd = existedFlowNode ?? new FlowNode<TFlowContext>(flowNodeIndex, FlowNodeType.Variable, false, shouldSkipValidation);
             return AddNext(flowNodeToAdd);
         }
 
@@ -146,8 +136,10 @@ namespace Flow.GraphNodes
         {
             try
             {
-                ValidateReAddingNextFlowNode(flowNode.Index);
-                var shouldUpdateHasCyclicRouteState = FlowMap.FindNode(flowNode.Index) != null;
+                if (!shouldSkipValidation)
+                    ValidateReAddingNextFlowNode(flowNode.Index);
+
+                var shouldUpdateHasCyclicRouteState = !shouldSkipValidation && FlowMap.FindNode(flowNode.Index) != null;
                 FlowMap.AddNode(flowNode);
                 CreateDirection(flowNode);
 
@@ -164,7 +156,7 @@ namespace Flow.GraphNodes
 
         public virtual FlowNode<TFlowContext> CloneWithoutDirections()
         {
-            var clone = new FlowNode<TFlowContext>(Index, null, Type, false);
+            var clone = new FlowNode<TFlowContext>(Index, null, Type, false, shouldSkipValidation);
             if (flowNodeAction != null)
                 clone.AddAction(flowNodeAction.Invoke);
             if (flowNodeActionAsync != null)
@@ -176,6 +168,16 @@ namespace Flow.GraphNodes
         public void Run(TFlowContext flowContext) => RunInternal(flowContext).ConfigureAwait(false).GetAwaiter().GetResult();
 
         public async Task RunAsync(TFlowContext flowContext) => await RunInternal(flowContext);
+
+        private void FlowNodeInit(FlowNodeType flowNodeType, bool shouldCreateMap, bool shouldSkipValidation)
+        {
+            Type = flowNodeType;
+            this.shouldSkipValidation = shouldSkipValidation;
+            validationErrors = new List<FlowNodeValidationError>();
+
+            if (shouldCreateMap)
+                FlowMapInit();
+        }
 
         private void FlowMapInit()
         {

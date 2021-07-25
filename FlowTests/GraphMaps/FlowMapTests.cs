@@ -67,7 +67,7 @@ namespace FlowTests.GraphMaps
         public void Clone_ShouldCloneFlowNodeWithoutDirection()
         {
             // Arrange
-            var flowNodeMock = new Mock<FlowNode<FakeFlowContext>>(FakeNodeIndex.Index1.ToString(), FlowNodeType.Variable, true);
+            var flowNodeMock = new Mock<FlowNode<FakeFlowContext>>(FakeNodeIndex.Index1.ToString(), FlowNodeType.Variable, true, false);
             flowNodeMock.Setup(x => x.CloneWithoutDirections()).Returns(new FlowNode<FakeFlowContext>(FakeNodeIndex.Index1.ToString()));
 
             var flowMap = new FlowMap<FakeFlowContext>();

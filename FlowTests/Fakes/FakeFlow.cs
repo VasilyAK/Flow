@@ -155,4 +155,11 @@ namespace FlowTests.Fakes
         private void FlowNodeAction1(FakeFlowContext2 ctx) { }
         private void FlowNodeAction2(FakeFlowContext2 ctx) { }
     }
+
+    public class FakeFlow11 : Flow<FakeFlowContext>
+    {
+        public FakeFlow11() : base(FlowCache<FakeFlow11>()) { }
+
+        protected override void BuildFlowMap() { }
+    }
 }

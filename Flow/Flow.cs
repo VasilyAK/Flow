@@ -1,10 +1,12 @@
-﻿using Flow.Contracts.Enums;
+﻿using Flow.Contracts;
+using Flow.Contracts.Enums;
 using Flow.Exceptions;
 using Flow.Extensions;
 using Flow.GraphMaps;
 using Flow.GraphNodes;
 using Flow.Interfaces;
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -12,24 +14,24 @@ namespace Flow
 {
     public abstract class Flow<TFlowContext> : IDisposable where TFlowContext : FlowContext, new()
     {
+        protected static Dictionary<string, FlowCache> flowCache = new Dictionary<string, FlowCache>();
+        public static FlowCache FlowCache<TFlow>() where TFlow : Flow<TFlowContext> =>
+            flowCache.TryGetValue(typeof(TFlow).FullName, out var cache) ? cache : flowCache[typeof(TFlow).FullName] = new FlowCache();
+
         private readonly TFlowContext flowContext;
         private IFlowMap<TFlowContext> flowMapContainer { get; set; }
         protected IFlowMap<TFlowContext> flowMap { get; private set; }
 
-        public Flow()
+        public Flow(FlowCache childFlowCache = null)
         {
             flowContext = new TFlowContext();
-            flowContext.SubscribeSetNextEvent(SetNext);
-            InitializeFlowMap();
-            InitializeFlowStart();
+            FlowInit(childFlowCache);
         }
 
-        public Flow(TFlowContext flowContext)
+        public Flow(TFlowContext flowContext, FlowCache childFlowCache = null)
         {
             this.flowContext = flowContext;
-            flowContext.SubscribeSetNextEvent(SetNext);
-            InitializeFlowMap();
-            InitializeFlowStart();
+            FlowInit(childFlowCache);
         }
 
         /// <summary>
@@ -88,12 +90,21 @@ namespace Flow
             flowContext.RefreshFlowNodesExecutionSequence();
         }
 
-        //ToDo продумать кеширование, чтобы не запускать валидацию карты при каждом создании инстанса
-        private void InitializeFlowMap()
+        private void FlowInit(FlowCache childFlowCache)
         {
+            flowContext.SubscribeSetNextEvent(SetNext);
+            InitializeFlowMap(childFlowCache);
+            InitializeFlowStart();
+        }
+
+        private void InitializeFlowMap(FlowCache childFlowCache)
+        {
+            if (childFlowCache?.FlowMapCreatingError != null)
+                throw childFlowCache.FlowMapCreatingError.ToFlowException();
+
             flowMap = new FlowMap<TFlowContext>();
             BuildFlowMap();
-            ValidateFlowMap();
+            ValidateFlowMap(childFlowCache);
             CloseAccessToFlowMap();
         }
 
@@ -137,13 +148,15 @@ namespace Flow
                 flowContext.SetNext(currentNode.NextNodes.Values.First().Index);
         }
 
-        private void ValidateFlowMap()
+        private void ValidateFlowMap(FlowCache childFlowCache)
         {
             if (flowMap.IsValid)
                 return;
 
-            var flowMapValidateError = flowMap.ValidationErrors.First();
-            throw flowMapValidateError.ToFlowException();
+            var error = flowMap.ValidationErrors.First();
+            if (childFlowCache != null)
+                childFlowCache.FlowMapCreatingError = error;
+             throw error.ToFlowException();
         }
     }
 }

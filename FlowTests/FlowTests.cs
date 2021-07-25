@@ -1,4 +1,6 @@
-﻿using Flow.Exceptions;
+﻿using Flow;
+using Flow.Contracts;
+using Flow.Exceptions;
 using Flow.Extensions;
 using FlowTests.Fakes;
 using FluentAssertions;
@@ -34,6 +36,44 @@ namespace FlowTests
 
             // Assert
             act.Should().Throw<NullReferenceException>();
+        }
+
+        [Fact]
+        public void CreateFlow_ShouldThrowErrorFromFlowCache()
+        {
+            // Arrange
+            var errorMessageFromCache = "Error from cache.";
+            FakeFlow11.FlowCache<FakeFlow11>().FlowMapCreatingError = new FlowMapValidationError
+            {
+                Message = errorMessageFromCache
+            };
+
+            // Act
+            Action act = () => { var flow = new FakeFlow11(); };
+
+            // Assert
+            var error = act.Should().Throw<FlowException>();
+            error.WithMessage(errorMessageFromCache);
+            Flow<FakeFlowContext>.FlowCache<Flow<FakeFlowContext>>().Should().BeEquivalentTo(new FlowCache());
+            FakeFlow11.FlowCache<FakeFlow11>().Flush();
+        }
+
+        [Fact]
+        public void CreatedFlow_ShouldSetFlowCache()
+        {
+            // Act
+            Action act = () => { var flow = new FakeFlow11(); };
+
+            // Assert
+            var error = act.Should().Throw<FlowException>();
+            FakeFlow11.FlowCache<FakeFlow11>().Should().BeEquivalentTo(new FlowCache
+            {
+                FlowMapCreatingError = new FlowMapValidationError
+                {
+                    Message = error.And.Message,
+                },
+            });
+            FakeFlow11.FlowCache<FakeFlow11>().Flush();
         }
 
         [Theory]

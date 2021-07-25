@@ -17,6 +17,7 @@ namespace Flow.GraphMaps
         protected readonly List<FlowMapValidationError> validationErrors;
 
         public bool IsValid => !ValidationErrors.Any();
+        private readonly bool shouldSkipValidation;
         public FlowMapValidationError[] ValidationErrors
         {
             get
@@ -34,8 +35,9 @@ namespace Flow.GraphMaps
             }
         }
 
-        public FlowMap()
+        public FlowMap(bool shouldSkipValidation = false)
         {
+            this.shouldSkipValidation = shouldSkipValidation;
             validationErrors = new List<FlowMapValidationError>();
         }
 
@@ -52,7 +54,7 @@ namespace Flow.GraphMaps
 
         public IFlowNode<TFlowContext> AddRoot(string flowNodeIndex)
         {
-            var rootFlowNode = new FlowNode<TFlowContext>(flowNodeIndex.ToString(), FlowNodeType.Root, false);
+            var rootFlowNode = new FlowNode<TFlowContext>(flowNodeIndex.ToString(), FlowNodeType.Root, false, shouldSkipValidation);
             return AddNode(rootFlowNode);
         }
 
@@ -61,7 +63,7 @@ namespace Flow.GraphMaps
 
         public IFlowNode<TFlowContext> AddRoot(string flowNodeIndex, Action<TFlowContext> flowNodeAction = null)
         {
-            var rootFlowNode = new FlowNode<TFlowContext>(flowNodeIndex.ToString(), flowNodeAction, FlowNodeType.Root, false);
+            var rootFlowNode = new FlowNode<TFlowContext>(flowNodeIndex.ToString(), flowNodeAction, FlowNodeType.Root, false, shouldSkipValidation);
             return AddNode(rootFlowNode);
         }
 
@@ -71,7 +73,7 @@ namespace Flow.GraphMaps
 
         public IFlowNode<TFlowContext> AddRoot(string flowNodeIndex, Func<TFlowContext, Task> flowNodeAction = null)
         {
-            var rootFlowNode = new FlowNode<TFlowContext>(flowNodeIndex.ToString(), flowNodeAction, FlowNodeType.Root, false);
+            var rootFlowNode = new FlowNode<TFlowContext>(flowNodeIndex.ToString(), flowNodeAction, FlowNodeType.Root, false, shouldSkipValidation);
             return AddNode(rootFlowNode);
         }
 
@@ -81,7 +83,7 @@ namespace Flow.GraphMaps
 
         public FlowMap<TFlowContext> Clone()
         {
-            var clone = new FlowMap<TFlowContext>();
+            var clone = new FlowMap<TFlowContext>(shouldSkipValidation);
             var flowNodes = graphNodes.Select(fn => fn.Value).ToArray();
 
             foreach (var flowNode in flowNodes)

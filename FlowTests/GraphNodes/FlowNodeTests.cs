@@ -208,6 +208,78 @@ namespace FlowTests.GraphNodes
                 Type = FlowNodeErrorType.ReAddingNextFlowNode,
             });
         }
+
+        [Fact]
+        public void AddNext_ShouldNotDetectedReAddingFlowNodes_IfShouldSkipValidation()
+        {
+            // Arrange
+            var flowNode = new FlowNode<FakeFlowContext>(FakeNodeIndex.Index1.FullName(), FlowNodeType.Variable, true, true);
+
+            // Act
+            flowNode.AddNext(FakeNodeIndex.Index2);
+            flowNode.AddNext(FakeNodeIndex.Index2);
+
+            // Assert
+            flowNode.IsValid.Should().BeTrue();
+            flowNode.ValidationErrors.Should().BeEmpty();
+        }
+
+        [Fact]
+        public void AddNext_ShouldSetHasCyclicRouteState()
+        {
+            // Arrange
+            var flowNode1 = new FlowNode<FakeFlowContext>(FakeNodeIndex.Index1.FullName());
+            var flowNode2 = new FlowNode<FakeFlowContext>(FakeNodeIndex.Index2.FullName());
+            var flowNode3 = new FlowNode<FakeFlowContext>(FakeNodeIndex.Index3.FullName());
+
+            // Act
+            flowNode1.AddNext(flowNode2);
+            flowNode2.AddNext(flowNode3);
+            flowNode3.AddNext(flowNode2);
+
+            // Assert
+            flowNode1.HasCyclicRoute.Should().BeFalse();
+            flowNode2.HasCyclicRoute.Should().BeTrue();
+            flowNode3.HasCyclicRoute.Should().BeTrue(); 
+            
+            flowNode2.ValidationErrors.Should().HaveCount(1);
+            flowNode2.ValidationErrors.First().Should().BeEquivalentTo(new FlowNodeValidationError
+            {
+                FlowRoute = new string[] { FakeNodeIndex.Index2.FullName(), FakeNodeIndex.Index3.FullName(), FakeNodeIndex.Index2.FullName() },
+                Message = "Cyclic execution detected.",
+                Type = FlowNodeErrorType.CyclicDependency,
+            });
+
+            flowNode3.ValidationErrors.Should().HaveCount(1);
+            flowNode3.ValidationErrors.First().Should().BeEquivalentTo(new FlowNodeValidationError
+            {
+                FlowRoute = new string[] { FakeNodeIndex.Index3.FullName(), FakeNodeIndex.Index2.FullName(), FakeNodeIndex.Index3.FullName() },
+                Message = "Cyclic execution detected.",
+                Type = FlowNodeErrorType.CyclicDependency,
+            });
+        }
+
+        [Fact]
+        public void AddNext_ShouldNotSetHasCyclicRouteStates_IfShouldSkipValidation()
+        {
+            // Arrange
+            var flowNode1 = new FlowNode<FakeFlowContext>(FakeNodeIndex.Index1.FullName(), FlowNodeType.Variable, true, true);
+            var flowNode2 = new FlowNode<FakeFlowContext>(FakeNodeIndex.Index2.FullName(), FlowNodeType.Variable, true, true);
+            var flowNode3 = new FlowNode<FakeFlowContext>(FakeNodeIndex.Index3.FullName(), FlowNodeType.Variable, true, true);
+
+            // Act
+            flowNode1.AddNext(flowNode2);
+            flowNode2.AddNext(flowNode3);
+            flowNode3.AddNext(flowNode2);
+
+            // Assert
+            flowNode1.HasCyclicRoute.Should().BeFalse();
+            flowNode2.HasCyclicRoute.Should().BeFalse();
+            flowNode3.HasCyclicRoute.Should().BeFalse();
+
+            flowNode2.ValidationErrors.Should().BeEmpty();
+            flowNode3.ValidationErrors.Should().BeEmpty();
+        }
         #endregion
 
         #region CloneWithoutDirections
