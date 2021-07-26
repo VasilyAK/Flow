@@ -59,7 +59,37 @@ namespace FlowTests
         }
 
         [Fact]
-        public void CreatedFlow_ShouldSetFlowCache()
+        public void CreatedFlow_ShouldSkipValidationsFromCache()
+        {
+            // Arrange
+            FakeFlow12.FlowCache<FakeFlow12>().ShouldSkipValidations = true;
+
+            // Act
+            Action act = () => { var flow = new FakeFlow12(); };
+
+            // Assert
+            act.Should().NotThrow<FlowException>();
+            Flow<FakeFlowContext>.FlowCache<Flow<FakeFlowContext>>().Should().BeEquivalentTo(new FlowCache());
+            FakeFlow12.FlowCache<FakeFlow12>().Flush();
+        }
+
+        [Fact]
+        public void CreatedFlow_ShouldSetSkipValidationsIntoFlowCache()
+        {
+            // Act
+            Action act = () => { var flow = new FakeFlow13(); };
+
+            // Assert
+            act.Should().NotThrow<FlowException>();
+            FakeFlow13.FlowCache<FakeFlow13>().Should().BeEquivalentTo(new FlowCache
+            {
+                ShouldSkipValidations = true,
+            });
+            FakeFlow13.FlowCache<FakeFlow13>().Flush();
+        }
+
+        [Fact]
+        public void CreatedFlow_ShouldSetFlowMapCreatingErrorIntoFlowCache()
         {
             // Act
             Action act = () => { var flow = new FakeFlow11(); };

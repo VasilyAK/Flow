@@ -102,7 +102,8 @@ namespace Flow
             if (childFlowCache?.FlowMapCreatingError != null)
                 throw childFlowCache.FlowMapCreatingError.ToFlowException();
 
-            flowMap = new FlowMap<TFlowContext>();
+            var shouldSkipValidations = childFlowCache?.ShouldSkipValidations == true;
+            flowMap = new FlowMap<TFlowContext>(shouldSkipValidations);
             BuildFlowMap();
             ValidateFlowMap(childFlowCache);
             CloseAccessToFlowMap();
@@ -150,8 +151,12 @@ namespace Flow
 
         private void ValidateFlowMap(FlowCache childFlowCache)
         {
-            if (flowMap.IsValid)
+            if (childFlowCache?.ShouldSkipValidations == true || flowMap.IsValid)
+            {
+                if (childFlowCache != null)
+                    childFlowCache.ShouldSkipValidations = true;
                 return;
+            }
 
             var error = flowMap.ValidationErrors.First();
             if (childFlowCache != null)
