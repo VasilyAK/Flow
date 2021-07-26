@@ -34,7 +34,7 @@ namespace FlowConsoleTests
 
         public FlowPerfomanceTest[] DoPerfomanceTest()
         {
-            var perfomanceTests = new FlowPerfomanceTest[]
+            var perfomanceTestsWithoutCache = new FlowPerfomanceTest[]
             {
                 new FlowPerfomanceTest(100, 10, 1, false, false, true),
                 new FlowPerfomanceTest(100, 10, 1, true, false, true),
@@ -58,7 +58,27 @@ namespace FlowConsoleTests
                 new FlowPerfomanceTest(10000, 100, 5, true, false, true),
             };
 
-            var cacheTests = new FlowPerfomanceTest[]
+            var cacheTestsWithoutError = new FlowPerfomanceTest[]
+            {
+                new FlowPerfomanceTest(1000, 100, 1, false, false, true),
+                new FlowPerfomanceTest(1000, 100, 1, false, false, false),
+                new FlowPerfomanceTest(1000, 100, 1, true, false, true),
+                new FlowPerfomanceTest(1000, 100, 1, true, false, false),
+                new FlowPerfomanceTest(1000, 100, 2, false, false, true),
+                new FlowPerfomanceTest(1000, 100, 2, false, false, false),
+                new FlowPerfomanceTest(1000, 100, 2, true, false, true),
+                new FlowPerfomanceTest(1000, 100, 2, true, false, false),
+                new FlowPerfomanceTest(1000, 100, 5, false, false, true),
+                new FlowPerfomanceTest(1000, 100, 5, false, false, false),
+                new FlowPerfomanceTest(1000, 100, 5, true, false, true),
+                new FlowPerfomanceTest(1000, 100, 5, true, false, false),
+                new FlowPerfomanceTest(10000, 100, 5, false, false, true),
+                new FlowPerfomanceTest(10000, 100, 5, false, false, false),
+                new FlowPerfomanceTest(10000, 100, 5, true, false, true),
+                new FlowPerfomanceTest(10000, 100, 5, true, false, false),
+            };
+
+            var cacheTestsWithError = new FlowPerfomanceTest[]
             {
                 new FlowPerfomanceTest(1000, 100, 1, false, true, true),
                 new FlowPerfomanceTest(1000, 100, 1, false, true, false),
@@ -81,13 +101,20 @@ namespace FlowConsoleTests
             var allTestsTime = new TimeSpan();
 
             Console.WriteLine("Run perfomance tests");
-            allTestsTime += RunTests(perfomanceTests);
+            allTestsTime += RunTests(perfomanceTestsWithoutCache);
             Console.WriteLine();
-            Console.WriteLine("Run cache perfomance tests");
-            allTestsTime += RunTests(cacheTests);
+            Console.WriteLine("Run cache perfomance tests without error");
+            allTestsTime += RunTests(cacheTestsWithoutError);
+            Console.WriteLine();
+            Console.WriteLine("Run cache perfomance tests with error");
+            allTestsTime += RunTests(cacheTestsWithError);
             Console.WriteLine();
             Console.WriteLine("Total test time: {0}", allTestsTime);
-            return perfomanceTests.Concat(cacheTests).ToArray();
+            
+            return perfomanceTestsWithoutCache
+                .Concat(cacheTestsWithoutError)
+                .Concat(cacheTestsWithError)
+                .ToArray();
         }
 
         private TimeSpan RunTests(FlowPerfomanceTest[] tests)
