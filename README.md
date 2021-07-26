@@ -14,7 +14,7 @@ Flow is a C # library whose internal logic is based on graph theory. The library
 
 - Flow: sequence of operations performed, each of which is identified by a unique code.
 
-- FlowNode:an atomic thread structure that is responsible for executing a designated operation.
+- FlowNode: an atomic thread structure that is responsible for executing a designated operation.
 
 - FlowMap: a set of instructions describing the flow of operations and dependencies between flow nodes.
 
