@@ -205,6 +205,7 @@ Flow is a C # library whose internal logic is based on graph theory. The library
 ```c#
     public interface IFlowNode<TFlowContext> : IReadOnlyFlowNode where TFlowContext : IFlowContext
     {
+        // Should use for debug only
         FlowNodeValidationError[] ValidationErrors { get; }
 
         // Assign an executable action to the node

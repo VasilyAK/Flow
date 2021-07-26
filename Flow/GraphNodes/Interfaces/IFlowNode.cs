@@ -6,6 +6,9 @@ namespace Flow
 {
     public interface IFlowNode<TFlowContext> : IReadOnlyFlowNode where TFlowContext : IFlowContext
     {
+        /// <summary>
+        /// Should use for debug only
+        /// </summary>
         FlowNodeValidationError[] ValidationErrors { get; }
 
         /// <summary>
