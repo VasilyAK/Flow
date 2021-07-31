@@ -12,11 +12,11 @@ jobs:
 
     steps:
     - name: Defining a branch
-      run: .\Utils\DefineBranch.ps1
+      run: Utils\DefineBranch.ps1
       shell: powershell
 
     - name: Update release version
-      run: .\Utils\GetNewVersion.ps1
+      run: Utils\GetNewVersion.ps1
       shell: powershell
 
   Build_Flow:
