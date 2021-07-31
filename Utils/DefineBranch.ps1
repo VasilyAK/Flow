@@ -12,4 +12,4 @@ function Get-Git-BranchName {
 
 [string] $BranchName = Get-Git-BranchName -GitBranchHead $BranchHead
 Write-Host "Branch name: $BranchName"
-BRANCH_NAME=$BranchName >> $BRANCH_NAME
+echo "BRANCH_NAME=$BranchName" | Out-File -FilePath $env:BRANCH_NAME -Encoding utf-8
