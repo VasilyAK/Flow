@@ -21,7 +21,7 @@ jobs:
       shell: powershell
 
     - name: Update release version
-      run: .\Utils\GetNewVersion.ps1 BranchName ${{ env:$BRANCH_NAME }}
+      run: .\Utils\GetNewVersion.ps1 -BranchName ${{ env:$BRANCH_NAME }}
       shell: powershell
 
     - name: Setup .NET
