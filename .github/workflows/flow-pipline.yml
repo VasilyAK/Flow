@@ -12,7 +12,9 @@ jobs:
 
     steps:
     - name: Defining a branch
-      run: .\Utils\DefineBranch.ps1
+      run: |
+        Get-ChildItem
+        .\Utils\DefineBranch.ps1
       shell: powershell
 
     - name: Update release version
