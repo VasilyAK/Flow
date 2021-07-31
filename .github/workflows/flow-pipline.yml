@@ -6,30 +6,25 @@ env:
   BRANCH_NAME: noBranch
 
 jobs:
-  Preparation:
-    name: Preparation
+  Build_Flow:
+    name: Build Flow
     runs-on: windows-latest 
 
     steps:
     - name: Clone repo
       uses: actions/checkout@v2
-      with:
-        clean: 'false'
 
     - name: Defining a branch
-      run: .\Utils\DefineBranch.ps1
+      run: |
+        Write-Host $GITHUB_REF
+        Write-Host ${env:$GITHUB_REF}
+        .\Utils\DefineBranch.ps1
       shell: powershell
 
     - name: Update release version
       run: .\Utils\GetNewVersion.ps1
       shell: powershell
 
-  Build_Flow:
-    needs: Preparation
-    name: Test Flow project
-    runs-on: windows-latest
-
-    steps:
     - name: Setup .NET
       uses: actions/setup-dotnet@v1
       with:
