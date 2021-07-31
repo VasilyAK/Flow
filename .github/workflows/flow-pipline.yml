@@ -13,11 +13,11 @@ jobs:
     steps:
     - name: Clone repo
       uses: actions/checkout@v2
+      with:
+        clean: 'false'
 
     - name: Defining a branch
-      run: |
-        Get-ChildItem
-        .\Utils\DefineBranch.ps1
+      run: .\Utils\DefineBranch.ps1
       shell: powershell
 
     - name: Update release version
