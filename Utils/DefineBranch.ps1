@@ -1,4 +1,4 @@
-﻿[string] $BranchHead = ${env:$GITHUB_REF}
+﻿param ([string] $BranchHead)
 
 function Get-Git-BranchName {
     param ([string] $GitBranchHead)
@@ -12,4 +12,4 @@ function Get-Git-BranchName {
 
 [string] $BranchName = Get-Git-BranchName -GitBranchHead $BranchHead
 Write-Host "Branch name: $BranchName"
-${env:$BRANCH_NAME} = $BranchName
+Write-Output "::set-env name=BRANCH_NAME::$BranchName"

@@ -1,4 +1,5 @@
-﻿[string] $BranchName = ${env:$BRANCH_NAME}
+﻿param([string] $BranchName)
+
 [string] $ReleaseBranch = "release"
 
 function Get-ReleaseVersion {
