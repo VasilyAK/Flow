@@ -1,35 +1,53 @@
 name: Flow-CI
 
-on:
-  push:
-    branches: master
-  pull_request:
-    branches: master
+on: [push, pull_request]
+
+env:
+  BRANCH_NAME: noBranch
 
 jobs:
+  Preparation:
+    name: Preparation
+    runs-on: windows-latest 
+
+    steps:
+    - name: Defining a branch
+      run: .\Utils\DefineBranch.ps1
+      shell: powershell
+
+    - name: Update release version
+      run: .\Utils\GetNewVersion.ps1
+      shell: powershell
+
   Build_Flow:
+    needs: Preparation
     name: Test Flow project
     runs-on: windows-latest
-    
+
     steps:
     - name: Clone repo
       uses: actions/checkout@v2
+
     - name: Setup .NET
       uses: actions/setup-dotnet@v1
       with:
        dotnet-version: 5.x
+
     - name: Restore NuGet
       uses: nuget/setup-nuget@v1
       with:
         nuget-api-key: ${{ secrets.NuGetAPIKey }}
         nuget-version: '5.x'
+
     - name: Restore dependencies
       run: |
         dotnet restore "Flow/Flow.sln"
         dotnet restore "FlowTests/FlowTests.sln"
+
     - name: Build
       run: |
         dotnet build "Flow/Flow.sln" --no-restore
         dotnet build "FlowTests/FlowTests.sln" --no-restore
+
     - name: Test
       run: dotnet test "FlowTests/FlowTests.sln" --no-build --verbosity normal
