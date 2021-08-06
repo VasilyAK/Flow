@@ -106,7 +106,7 @@ function Get-NewFixVersion
     Return Get-NewFixVersionWithError
 }
 
-Write-Host: "Start parse branch head: $BranchHead"
+Write-Host "Start parse branch head: $BranchHead"
 [string] $BranchName = Get-Git-BranchName -GitBranchHead $BranchHead
 
 if ($BranchName.StartsWith("$ReleaseBranch")) {
