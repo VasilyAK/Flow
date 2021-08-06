@@ -17,8 +17,8 @@ jobs:
 
     - name: Update release version
       run: |
-        Write-Host "Out of file: {{ github.ref }}"
-        .\Utils\DefineBranch.ps1 -BranchHead {{ github.ref }} -NuGetPackageId Flow_VasilyAK
+        Write-Host "Out of file: $(env.GITHUB_REF)"
+        .\Utils\DefineBranch.ps1 -BranchHead $(env.GITHUB_REF) -NuGetPackageId Flow_VasilyAK
       shell: powershell
 
     - name: Setup .NET
