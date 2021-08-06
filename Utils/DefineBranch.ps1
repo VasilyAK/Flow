@@ -50,8 +50,8 @@ function Get-LatestNuGetPackageVersion
                $LatestNuGetReleaseVersion = $NuGetReleaseVersions[0]
             }
         } else {
-            Write-Information "No response received from the $URL."
-            Write-Information "Status code: ${Response.StatusCode}"
+            Write-Host "No response received from the $URL."
+            Write-Host "Status code: ${Response.StatusCode}"
         }
     }
     catch [System.Net.WebException]
@@ -106,6 +106,7 @@ function Get-NewFixVersion
     Return Get-NewFixVersionWithError
 }
 
+Write-Host: "Start parse branch head: $BranchHead"
 [string] $BranchName = Get-Git-BranchName -GitBranchHead $BranchHead
 
 if ($BranchName.StartsWith("$ReleaseBranch")) {
