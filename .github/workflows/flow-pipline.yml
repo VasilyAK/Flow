@@ -17,7 +17,7 @@ jobs:
 
     - name: Update release version
       run: |
-        Write-Host "Out of file: $(env.GITHUB_REF)"
+        Write-Host "Out of file: $Env.GITHUB_REF"
         .\Utils\DefineBranch.ps1 -BranchHead $(env.GITHUB_REF) -NuGetPackageId Flow_VasilyAK
       shell: powershell
 
