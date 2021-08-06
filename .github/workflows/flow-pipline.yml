@@ -4,6 +4,7 @@ on: [push, pull_request]
 
 env:
   BRANCH_NAME: noBranch
+  RELEASE_VERSION: '0.0.0'
 
 jobs:
   Build_Flow:
@@ -14,20 +15,14 @@ jobs:
     - name: Clone repo
       uses: actions/checkout@v2
 
-    - name: Defining a branch
-      run: |
-        Write-Host $env:GITHUB_REF
-        .\Utils\DefineBranch.ps1 -BranchHead $env:GITHUB_REF
-      shell: powershell
-
     - name: Update release version
-      run: .\Utils\GetNewVersion.ps1 -BranchName $env:BRANCH_NAME
+      run: .\Utils\DefineBranch.ps1 -BranchHead $env:GITHUB_REF -NuGetPackageId Flow_VasilyAK
       shell: powershell
 
     - name: Setup .NET
       uses: actions/setup-dotnet@v1
       with:
-       dotnet-version: 5.x
+        dotnet-version: 5.x
 
     - name: Restore NuGet
       uses: nuget/setup-nuget@v1
