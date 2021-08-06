@@ -16,7 +16,9 @@ jobs:
       uses: actions/checkout@v2
 
     - name: Update release version
-      run: .\Utils\DefineBranch.ps1 -BranchHead env.GITHUB_REF -NuGetPackageId Flow_VasilyAK
+      run: |
+        Write-Host "Out of file: $Env:GITHUB_REF"
+        .\Utils\DefineBranch.ps1 -BranchHead $Env:GITHUB_REF -NuGetPackageId Flow_VasilyAK
       shell: powershell
 
     - name: Setup .NET
