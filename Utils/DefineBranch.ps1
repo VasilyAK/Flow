@@ -1,5 +1,6 @@
-﻿([string] $BranchHead, [string] $NuGetPackageId)
+﻿([string] $NuGetPackageId)
 
+[string] $BranchHead = $Env:GITHUB_REF
 [string] $ReleaseBranch = "release"
 [string] $NewReleasePostfix = "-new"
 
