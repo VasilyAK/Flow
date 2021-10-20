@@ -19,8 +19,8 @@ namespace Flow
             flowCache.TryGetValue(typeof(TFlow).FullName, out var cache) ? cache : flowCache[typeof(TFlow).FullName] = new FlowCache();
 
         private readonly TFlowContext flowContext;
-        private IFlowMap<TFlowContext> flowMapContainer { get; set; }
-        protected IFlowMap<TFlowContext> flowMap { get; private set; }
+        private IFlowMap<TFlowContext> flowMapContainer;
+        protected IFlowMap<TFlowContext> flowMap { get; private set; } // todo to private
 
         public Flow(FlowCache childFlowCache = null)
         {
@@ -53,9 +53,19 @@ namespace Flow
         }
 
         /// <summary>
+        /// Execute after fetching each flow node
+        /// </summary>
+        protected virtual void AfterEach(TFlowContext flowContext) { }
+
+        /// <summary>
+        /// Execute before fetching each flow node
+        /// </summary>
+        protected virtual void BeforeEach(TFlowContext flowContext) { }
+
+        /// <summary>
         /// Build a flow map
         /// </summary>
-        protected virtual void BuildFlowMap() { }
+        protected abstract void BuildFlowMap();
 
         private void CloseAccessToFlowMap()
         {
@@ -70,10 +80,8 @@ namespace Flow
 
         private void ExecuteFlowNode(FlowNode<TFlowContext> flowNode, bool isAsync)
         {
-            if (flowNode.Type.Equals(FlowNodeType.Root)
-                || flowNode.FindAnyDirectedRoute(flowContext.PreviousFlowNode.Index) != null)
-                RunFlowNode(flowNode, isAsync);
-            else
+            if (!flowNode.Type.Equals(FlowNodeType.Root)
+                && flowNode.FindAnyDirectedRoute(flowContext.PreviousFlowNode.Index) == null)
             {
                 var routesFlowNodeIndexSequence = flowNode.FindDirectedRoutes()
                     .Select(r => r.NodesSequence.Select(fn => fn.Index).ToArray())
@@ -84,8 +92,13 @@ namespace Flow
                     routesFlowNodeIndexSequence);
             }
 
+            BeforeEach(flowContext);
+            RunFlowNode(flowNode, isAsync);
+
             if (flowContext.NextFlowNode == null)
                 SetNextAuto(flowNode);
+
+            AfterEach(flowContext);
 
             flowContext.RefreshFlowNodesExecutionSequence();
         }

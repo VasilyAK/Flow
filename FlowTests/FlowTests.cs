@@ -271,6 +271,39 @@ namespace FlowTests
             var error = act.Should().Throw<FlowExecutionException>();
             error.WithMessage(expected);
         }
+
+        [Theory]
+        [InlineData(true)]
+        [InlineData(false)]
+        public async Task RunFlow_ShouldRunBeforeEachAndAfterEachMiddlewares(bool isAsync)
+        {
+            // Arrange
+            var flow = new FakeFlow14();
+
+            // Act
+            var result = isAsync ? await flow.RunFlowAsync() : flow.RunFlow();
+
+            // Assert
+            result.AfterEachSequence.Should().BeEquivalentTo(new int[] { 3, 6 });
+            result.BeforeEachSequence.Should().BeEquivalentTo(new int[] { 1, 4 });
+            result.FlowNode1ExecutionSequence.Should().BeEquivalentTo(new int[] { 2 });
+            result.FlowNode2ExecutionSequence.Should().BeEquivalentTo(new int[] { 5 });
+        }
+
+        [Theory]
+        [InlineData(true)]
+        [InlineData(false)]
+        public async Task RunFlow_ShouldSetNextAutoBeforeAfterEach(bool isAsync)
+        {
+            // Arrange
+            var flow = new FakeFlow15();
+
+            // Act
+            var result = isAsync ? await flow.RunFlowAsync() : flow.RunFlow();
+
+            // Assert
+            result.TestData.Should().Be(FakeNodeIndex.Index2.ToString());
+        }
         #endregion
     }
 }

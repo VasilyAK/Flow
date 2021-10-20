@@ -87,5 +87,18 @@ namespace FlowConsoleTests
             var summ = context.FirstValue + context.SecondValue + context.ThirdValue;
             return (context.SelectedBranch, summ);
         }
+
+        protected override void AfterEach(FlowContextExample flowContext)
+        {
+            var nextNodeMessage = flowContext.NextFlowNode == null
+                ? "The flow has finished its work"
+                : $"Next node: {flowContext.NextFlowNode.Index}";
+            Console.WriteLine($"Flow node was executed: {flowContext.CurrentFlowNode.Index}" + " " + nextNodeMessage);
+        }
+
+        protected override void BeforeEach(FlowContextExample flowContext)
+        {
+            Console.WriteLine($"Flow node will be executed: {flowContext.CurrentFlowNode.Index}");
+        }
     }
 }

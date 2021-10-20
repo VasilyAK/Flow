@@ -19,7 +19,7 @@ Flow is a C # library whose internal logic is based on graph theory. The library
 - FlowMap: a set of instructions describing the flow of operations and dependencies between flow nodes.
 
 - FlowContext: an object for transmitting commands to a flow, as well as for transmitting the results of operations between the nodes of the flow.
-
+Execute after fetching each flow node
 ## User documentation
 
 <details>
@@ -122,6 +122,30 @@ Flow is a C # library whose internal logic is based on graph theory. The library
 ```
 </details>
 
+<details>
+  <summary>Middlewares</summary>
+
+```c#
+    public class FlowExample : Flow<FlowContextExample>
+    {
+        ...
+
+        protected override void AfterEach(FlowContextExample flowContext)
+        {
+            var nextNodeMessage = flowContext.NextFlowNode == null
+                ? "The flow has finished its work"
+                : $"Next node: {flowContext.NextFlowNode.Index}";
+            Console.WriteLine($"Flow node was executed: {flowContext.CurrentFlowNode.Index}" + " " + nextNodeMessage);
+        }
+
+        protected override void BeforeEach(FlowContextExample flowContext)
+        {
+            Console.WriteLine($"Flow node will be executed: {flowContext.CurrentFlowNode.Index}");
+        }
+    }
+```
+</details>
+
 ## Programming interfaces
 
 <details>
@@ -135,6 +159,11 @@ Flow is a C # library whose internal logic is based on graph theory. The library
         // Start the flow for execution
         public TFlowContext RunFlow();
         public async Task<TFlowContext> RunFlowAsync();
+
+        // Execute after fetching each flow node
+        protected virtual void AfterEach(TFlowContext flowContext) { };
+        // Execute before fetching each flow node
+        protected virtual void BeforeEach(TFlowContext flowContext) { };
 
         // Build a flow map
         protected virtual void BuildFlowMap() { };

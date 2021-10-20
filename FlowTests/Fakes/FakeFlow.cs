@@ -188,4 +188,57 @@ namespace FlowTests.Fakes
 
         private void FlowNodeAction1(FakeFlowContext ctx) { }
     }
+
+    public class FakeFlow14 : Flow<FakeFlowContext3>
+    {
+        private int counter = 1;
+
+        protected override void AfterEach(FakeFlowContext3 ctx)
+        {
+            ctx.AfterEachSequence.Add(counter);
+            counter += 1;
+        }
+
+        protected override void BeforeEach(FakeFlowContext3 ctx)
+        {
+            ctx.BeforeEachSequence.Add(counter);
+            counter += 1;
+        }
+
+        protected override void BuildFlowMap()
+        {
+            flowMap.AddRoot(FakeNodeIndex.Index1.ToString(), FlowNodeAction1)
+                .AddNext(FakeNodeIndex.Index2.ToString(), FlowNodeAction2);
+        }
+
+        private void FlowNodeAction1(FakeFlowContext3 ctx)
+        {
+            ctx.FlowNode1ExecutionSequence.Add(counter);
+            counter += 1;
+        }
+
+        private void FlowNodeAction2(FakeFlowContext3 ctx)
+        {
+            ctx.FlowNode2ExecutionSequence.Add(counter);
+            counter += 1;
+        }
+    }
+
+    public class FakeFlow15 : Flow<FakeFlowContext2>
+    {
+        protected override void AfterEach(FakeFlowContext2 ctx)
+        {
+            if (ctx.NextFlowNode != null)
+                ctx.TestData = ctx.NextFlowNode.Index;
+        }
+
+        protected override void BuildFlowMap()
+        {
+            flowMap.AddRoot(FakeNodeIndex.Index1.ToString(), FlowNodeAction1)
+                .AddNext(FakeNodeIndex.Index2.ToString(), FlowNodeAction2);
+        }
+
+        private void FlowNodeAction1(FakeFlowContext2 ctx) { }
+        private void FlowNodeAction2(FakeFlowContext2 ctx) { }
+    }
 }
